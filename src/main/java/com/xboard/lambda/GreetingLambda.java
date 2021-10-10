@@ -3,7 +3,6 @@ package com.xboard.lambda;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2WebSocketEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -33,7 +32,6 @@ public class GreetingLambda implements RequestHandler<HashMap<String, Object>, A
                 .tableName(System.getenv("TABLE_NAME"))
                 .item(itemValues)
                 .build();
-
 
         try{
             client.putItem(request);
