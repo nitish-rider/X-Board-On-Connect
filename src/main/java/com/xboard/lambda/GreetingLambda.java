@@ -4,6 +4,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2WebSocketEvent;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.HashMap;
 
@@ -13,13 +16,15 @@ import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 
-public class GreetingLambda implements RequestHandler<APIGatewayV2WebSocketEvent, APIGatewayProxyResponseEvent>
+public class GreetingLambda implements RequestHandler<HashMap<String, Object>, APIGatewayProxyResponseEvent>
 {
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayV2WebSocketEvent input, Context context) {
+    public APIGatewayProxyResponseEvent handleRequest(HashMap<String, Object> input, Context context) {
         DynamoDbClient client = DynamoDbClient.create();
-        String  connectionId = input.getRequestContext().getConnectionId();
+        Gson s = new Gson();
+        JsonObject object = JsonParser.parseString(s.toJson(input)).getAsJsonObject();
+        String connectionId = object.get("requestContext").getAsJsonObject().get("connectionId").getAsString();
 
         HashMap<String, AttributeValue> itemValues = new HashMap<>();
         itemValues.put("connectionId", AttributeValue.builder().s(connectionId).build());
