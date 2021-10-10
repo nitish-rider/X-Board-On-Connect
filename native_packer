@@ -1,0 +1,8 @@
+cd build
+unzip function.zip
+mv bootstrap runner
+rm function.zip
+echo "#!/usr/bin/env bash" >> bootstrap
+echo "set -euo pipefail" >> bootstrap
+echo "./runner" >> bootstrap
+zip function.zip runner bootstrap
