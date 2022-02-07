@@ -4,15 +4,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2WebSocketEvent;
-import com.google.gson.Gson;
-
 import java.util.HashMap;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.dynamodb.model.*;
 
 public class GreetingLambda implements RequestHandler<APIGatewayV2WebSocketEvent, APIGatewayProxyResponseEvent>
 {
@@ -20,9 +15,9 @@ public class GreetingLambda implements RequestHandler<APIGatewayV2WebSocketEvent
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayV2WebSocketEvent input, Context context) {
         DynamoDbClient client = DynamoDbClient.create();
-        Gson s = new Gson();
-//        JsonObject object = JsonParser.parseString(s.toJson(input)).getAsJsonObject();
         String connectionId = input.getRequestContext().getConnectionId();
+
+
 
         HashMap<String, AttributeValue> itemValues = new HashMap<>();
         itemValues.put("connectionId", AttributeValue.builder().s(connectionId).build());
@@ -36,7 +31,6 @@ public class GreetingLambda implements RequestHandler<APIGatewayV2WebSocketEvent
         try{
             client.putItem(request);
             System.out.println(System.getenv("TABLE_NAME") + " was successfully updated");
-
         } catch (ResourceNotFoundException e) {
             System.err.format("Error: The Amazon DynamoDB table \"%s\" can't be found.\n", System.getenv("TABLE_NAME"));
             System.err.println("Be sure that it exists and that you've typed its name correctly!");
@@ -45,8 +39,6 @@ public class GreetingLambda implements RequestHandler<APIGatewayV2WebSocketEvent
             System.err.println(e.getMessage());
             System.exit(1);
         }
-
-
 
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         response.setIsBase64Encoded(false);
